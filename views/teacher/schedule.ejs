@@ -1,0 +1,86 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container my-4">
+    <h1 class="mb-4">My Teaching Schedule</h1>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="/teacher/manage-schedule" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Manage Schedule
+        </a>
+    </div>
+
+    <% if (scheduleEntries.length === 0) { %>
+        <div class="alert alert-info">
+            <p>You have no scheduled classes. Click on "Manage Schedule" to add new classes.</p>
+        </div>
+    <% } else { %>
+        <!-- Weekly Schedule -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered schedule-table">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 100px;">Time</th>
+                            <% days.slice(0, 6).forEach(day => { %>
+                                <th><%= day %></th>
+                            <% }); %>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <%
+                            // Define time slots (adjust as needed)
+                            const timeSlots = [
+                                { start: '08:30', end: '10:05' },
+                                { start: '10:15', end: '11:50' },
+                                { start: '12:00', end: '13:35' },
+                                { start: '13:50', end: '15:25' },
+                                { start: '15:40', end: '17:15' },
+                                { start: '17:25', end: '19:00' }
+                            ];
+
+                        timeSlots.forEach((timeSlot, index) => {
+                        %>
+                            <tr>
+                                <td class="time-column text-center">
+                                    <%= timeSlot.start %><br>-<br><%= timeSlot.end %>
+                                </td>
+
+                                <% for (let day = 1; day <= 6; day++) { %>
+                                    <td class="schedule-cell" data-day="<%= day %>">
+                                        <%
+                                            const entries = scheduleEntries.filter(entry => {
+                                                return entry.day_of_week === day &&
+                                                        entry.start_time <= timeSlot.end &&
+                                                        entry.end_time >= timeSlot.start;
+                                            });
+                                        %>
+
+                                        <% entries.forEach(entry => { %>
+                                            <div class="schedule-item teacher-view">
+                                                <div class="subject"><%= entry.subject_name %></div>
+                                                <div class="details">
+                                                    <div class="time"><%= entry.start_time.slice(0, 5) %> - <%= entry.end_time.slice(0, 5) %></div>
+                                                    <div class="group">Group: <%= entry.group_name %></div>
+                                                    <% if (entry.location) { %>
+                                                        <div class="location">Location: <%= entry.location %></div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    </td>
+                                <% } %>
+                            </tr>
+                        <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script src="/js/schedule.js"></script>
+
+<%- include('../partials/footer') %>

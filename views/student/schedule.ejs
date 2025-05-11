@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+<%- include('../partials/nav') %>
+
+<div class="container my-4">
+    <h1 class="mb-4">My Class Schedule</h1>
+
+    <% if (userGroups.length === 0) { %>
+        <div class="alert alert-info">
+            <p>You are not assigned to any groups yet. Please contact your administrator to be assigned to a group.</p>
+        </div>
+    <% } else { %>
+        <!-- Group Filter -->
+        <div class="mb-4">
+            <label for="groupFilter" class="form-label">Filter by Group:</label>
+            <select id="groupFilter" class="form-select">
+                <option value="all">All Groups</option>
+                <% userGroups.forEach(group => { %>
+                    <option value="<%= group %>"><%= group %></option>
+                <% }); %>
+            </select>
+        </div>
+
+        <!-- Weekly Schedule -->
+        <div class="card">
+            <div class="card-body">
+                <% if (scheduleEntries.length === 0) { %>
+                    <div class="alert alert-info">
+                        <p>No schedule entries found for your groups.</p>
+                    </div>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-bordered schedule-table">
+                            <thead class="table-light">
+                            <tr>
+                                <th style="width: 100px;">Time</th>
+                                <% days.slice(0, 6).forEach(day => { %>
+                                    <th><%= day %></th>
+                                <% }); %>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <%
+                                // Define time slots (adjust as needed)
+                                const timeSlots = [
+                                    { start: '08:30', end: '10:05' },
+                                    { start: '10:15', end: '11:50' },
+                                    { start: '12:00', end: '13:35' },
+                                    { start: '13:50', end: '15:25' },
+                                    { start: '15:40', end: '17:15' },
+                                    { start: '17:25', end: '19:00' }
+                                ];
+
+                            timeSlots.forEach((timeSlot, index) => {
+                            %>
+                                <tr>
+                                    <td class="time-column text-center">
+                                        <%= timeSlot.start %><br>-<br><%= timeSlot.end %>
+                                    </td>
+
+                                    <% for (let day = 1; day <= 6; day++) { %>
+                                        <td class="schedule-cell" data-day="<%= day %>">
+                                            <%
+                                                const entries = scheduleEntries.filter(entry => {
+                                                    return entry.day_of_week === day &&
+                                                            entry.start_time <= timeSlot.end &&
+                                                            entry.end_time >= timeSlot.start;
+                                                });
+                                            %>
+
+                                            <% entries.forEach(entry => { %>
+                                                <div class="schedule-item" data-group="<%= entry.group_name %>">
+                                                    <div class="subject"><%= entry.subject_name %></div>
+                                                    <div class="details">
+                                                        <div class="time"><%= entry.start_time.slice(0, 5) %> - <%= entry.end_time.slice(0, 5) %></div>
+                                                        <div class="teacher">Teacher: <%= entry.teacher_firstname %> <%= entry.teacher_lastname %></div>
+                                                        <div class="group">Group: <%= entry.group_name %></div>
+                                                        <% if (entry.location) { %>
+                                                            <div class="location">Location: <%= entry.location %></div>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            <% }); %>
+                                        </td>
+                                    <% } %>
+                                </tr>
+                            <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script src="/js/schedule.js"></script>
+
+<%- include('../partials/footer') %>

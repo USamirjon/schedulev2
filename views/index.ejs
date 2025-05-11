@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<div class="container mt-5">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">Welcome to University Schedule</h1>
+        <p class="lead">
+            A comprehensive scheduling system for students and teachers.
+        </p>
+        <hr class="my-4">
+        <p>
+            Access your personalized schedule, manage classes, and stay organized throughout the semester.
+        </p>
+        <a class="btn btn-primary btn-lg" href="/auth/login" role="button">Get Started</a>
+    </div>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-graduate fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">For Students</h5>
+                    <p class="card-text">View your class schedule, check class times and locations, and stay up to date with your academic calendar.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chalkboard-teacher fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">For Teachers</h5>
+                    <p class="card-text">Manage your teaching schedule, create and modify classes, and keep track of your assigned student groups.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-shield fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">For Administrators</h5>
+                    <p class="card-text">Oversee the entire scheduling system, manage users, subjects, and student group assignments.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
