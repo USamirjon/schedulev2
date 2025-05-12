@@ -1,0 +1,221 @@
+<!-- views/admin/schedules.ejs -->
+<%- contentFor('title') %>
+All Schedules
+
+<%- contentFor('content') %>
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Schedules</h1>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <form id="filterForm" class="row g-3">
+                <div class="col-md-4">
+                    <label for="dayFilter" class="form-label">Day of Week</label>
+                    <select class="form-select" id="dayFilter">
+                        <option value="">All Days</option>
+                        <% days.forEach((day, index) => { %>
+                            <option value="<%= index + 1 %>"><%= day %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="groupFilter" class="form-label">Group</label>
+                    <select class="form-select" id="groupFilter">
+                        <option value="">All Groups</option>
+                        <% groups.forEach(group => { %>
+                            <option value="<%= group %>"><%= group %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="teacherFilter" class="form-label">Teacher</label>
+                    <select class="form-select" id="teacherFilter">
+                        <option value="">All Teachers</option>
+                        <% teachers.forEach(teacher => { %>
+                            <option value="<%= teacher.id %>"><%= teacher.firstname %> <%= teacher.lastname %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="button" id="applyFilters" class="btn btn-primary">Apply Filters</button>
+                    <button type="button" id="resetFilters" class="btn btn-outline-secondary">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Schedule Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Schedule List</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="scheduleTable">
+                    <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Subject</th>
+                        <th>Teacher</th>
+                        <th>Group</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% scheduleEntries.forEach(entry => { %>
+                        <tr class="schedule-row"
+                            data-day="<%= entry.day_of_week %>"
+                            data-group="<%= entry.group_name %>"
+                            data-teacher="<%= entry.teacher_id %>">
+                            <td><%= days[entry.day_of_week - 1] %></td>
+                            <td><%= entry.start_time.substring(0, 5) %> - <%= entry.end_time.substring(0, 5) %></td>
+                            <td><%= entry.subject_name %></td>
+                            <td><%= entry.teacher_firstname %> <%= entry.teacher_lastname %></td>
+                            <td><%= entry.group_name %></td>
+                            <td><%= entry.location || 'N/A' %></td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info view-schedule" data-id="<%= entry.id %>">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <a href="/admin/schedules/<%= entry.id %>/edit" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger delete-schedule" data-id="<%= entry.id %>">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Schedule Modal -->
+<div class="modal fade" id="viewScheduleModal" tabindex="-1" aria-labelledby="viewScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="viewScheduleModalLabel">Schedule Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Day:</strong> <span id="modalDay"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Time:</strong> <span id="modalTime"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Subject:</strong> <span id="modalSubject"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Teacher:</strong> <span id="modalTeacher"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Group:</strong> <span id="modalGroup"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Location:</strong> <span id="modalLocation"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteScheduleModal" tabindex="-1" aria-labelledby="deleteScheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteScheduleModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this schedule entry? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDelete" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const applyFilters = () => {
+            const dayFilter = document.getElementById('dayFilter').value;
+            const groupFilter = document.getElementById('groupFilter').value;
+            const teacherFilter = document.getElementById('teacherFilter').value;
+
+            const rows = document.querySelectorAll('.schedule-row');
+
+            rows.forEach(row => {
+                const dayMatch = !dayFilter || row.dataset.day === dayFilter;
+                const groupMatch = !groupFilter || row.dataset.group === groupFilter;
+                const teacherMatch = !teacherFilter || row.dataset.teacher === teacherFilter;
+
+                if (dayMatch && groupMatch && teacherMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        };
+
+        document.getElementById('applyFilters').addEventListener('click', applyFilters);
+
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            document.getElementById('dayFilter').value = '';
+            document.getElementById('groupFilter').value = '';
+            document.getElementById('teacherFilter').value = '';
+
+            document.querySelectorAll('.schedule-row').forEach(row => {
+                row.style.display = '';
+            });
+        });
+
+        // View schedule details
+        document.querySelectorAll('.view-schedule').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+
+                document.getElementById('modalDay').textContent = row.cells[0].textContent;
+                document.getElementById('modalTime').textContent = row.cells[1].textContent;
+                document.getElementById('modalSubject').textContent = row.cells[2].textContent;
+                document.getElementById('modalTeacher').textContent = row.cells[3].textContent;
+                document.getElementById('modalGroup').textContent = row.cells[4].textContent;
+                document.getElementById('modalLocation').textContent = row.cells[5].textContent;
+
+                const modal = new bootstrap.Modal(document.getElementById('viewScheduleModal'));
+                modal.show();
+            });
+        });
+
+        // Delete schedule entry
+        document.querySelectorAll('.delete-schedule').forEach(button => {
+            button.addEventListener('click', function() {
+                const scheduleId = this.dataset.id;
+                document.getElementById('confirmDelete').href = `/admin/schedules/${scheduleId}/delete`;
+
+                const modal = new bootstrap.Modal(document.getElementById('deleteScheduleModal'));
+                modal.show();
+            });
+        });
+    });
+</script>

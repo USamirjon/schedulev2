@@ -1,6 +1,7 @@
 // controllers/userController.js
 const User = require('../models/User');
 const Schedule = require('../models/Schedule');
+const Subject = require('../models/Subject');
 
 // Admin: Get all users
 const getAllUsers = async (req, res) => {
